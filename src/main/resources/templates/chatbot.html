@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 style="text-align: center">Chatbot</h2>
+    <form class="form" enctype="multipart/form-data">
+        <div class="form-group">
+                <textarea rows="5" class="form-control" id="message" name="message" placeholder="Enter your message"
+                          required></textarea>
+        </div>
+        <button type="button" class="btn btn-primary float-right" onclick="sendMessage()">Send</button>
+    </form>
+    <div id="messageDiv"></div>
+</div>
+<script>
+    let stompClient;
+
+    function connect() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+            stompClient.subscribe('/topic-1/public', function (message) {
+                document.getElementById('messageDiv').innerHTML = `<p>${message.body}</p>`;
+            });
+        });
+    }
+
+
+    function sendMessage() {
+        const messageElement = document.getElementById('message');
+        let message = messageElement.value;
+        if (stompClient) {
+            stompClient.send("/api/chatbot/send", {}, message);
+            messageElement.value = '';
+        }
+    }
+
+    connect();
+
+</script>
+</body>
+</html>
