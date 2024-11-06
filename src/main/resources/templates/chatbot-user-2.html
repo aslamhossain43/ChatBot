@@ -9,20 +9,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 </head>
-<body>
-<div class="container mt-5">
-    <h2 style="text-align: center">Chatbot</h2>
-    <form class="form" enctype="multipart/form-data">
-        <div class="form-group">
-                <textarea rows="5" class="form-control" id="message" name="message" placeholder="Enter your message"
-                          required></textarea>
-        </div>
-        <button type="button" class="btn btn-primary float-right" onclick="sendMessage()">Send</button>
-    </form>
-    <div id="messageDiv"></div>
+<body class="container bg-dark" style="border-radius: .5rem;">
+<h1 style="text-align: center">Chatbot</h1>
+<div id="messageDiv"></div>
+<div class="input-group">
+    <input type="text" class="form-control rounded-pill bg-dark text-secondary" id="message" name="message"
+           placeholder="Type a message..."
+           required>
+    <button class="btn btn-primary rounded-pill ml-1" type="button" onclick="sendMessage()">Send</button>
 </div>
 <script>
     let stompClient;
+    let paragraph = ``;
 
     function connect() {
         const socket = new SockJS('/ws');
@@ -30,7 +28,13 @@
         stompClient.connect({}, (frame) => {
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic-1/public', (message) => {
-                document.getElementById('messageDiv').innerHTML = `<p>${message.body}</p>`;
+                const messageBody = JSON.parse(message.body);
+                if (messageBody.id === '2') {
+                    paragraph += `<p class="bg-primary rounded-pill text-light float-right" style="width: fit-content;padding: 5px">${messageBody.message}</p><br>`;
+                } else {
+                    paragraph += `<p class="bg-primary rounded-pill text-light" style="width: fit-content;padding: 5px">${messageBody.message}</p>`;
+                }
+                document.getElementById('messageDiv').innerHTML = paragraph;
             });
             const userToConnect = {id: "2", message: "Connection", messageType: "CONNECT"};
             stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToConnect));
