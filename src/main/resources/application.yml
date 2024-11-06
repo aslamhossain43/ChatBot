@@ -1,9 +1,7 @@
-server:
-  port: 8081
 spring:
   application:
     name: Chatbot
   kafka:
-    bootstrap-servers: 172.21.0.2:9092
+    bootstrap-servers: 172.23.0.2:9092
     listener:
       missing-topics-fatal: false      # Do not fail if the topic is missing

@@ -27,11 +27,15 @@
     function connect() {
         const socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
-        stompClient.connect({}, function (frame) {
+        stompClient.connect({}, (frame) => {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic-1/public', function (message) {
+            stompClient.subscribe('/topic-1/public', (message) => {
                 document.getElementById('messageDiv').innerHTML = `<p>${message.body}</p>`;
             });
+            const userToConnect = {id: "1", message: "Connection", messageType: "CONNECT"};
+            stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToConnect));
+        }, (error) => {
+            console.log('Error connecting: ', error);
         });
     }
 
@@ -39,8 +43,9 @@
     function sendMessage() {
         const messageElement = document.getElementById('message');
         let message = messageElement.value;
+        const userToMessage = {id: "1", message: "" + message + "", messageType: "CHAT"};
         if (stompClient) {
-            stompClient.send("/api/chatbot/send", {}, message);
+            stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToMessage));
             messageElement.value = '';
         }
     }

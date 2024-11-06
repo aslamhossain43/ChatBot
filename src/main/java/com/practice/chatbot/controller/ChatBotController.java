@@ -15,7 +15,11 @@ public class ChatBotController {
 
     @RequestMapping("")
     private String showChatbot() {
-        log.info("Chatbot view page is called");
-        return "chatbot";
+        try {
+            log.info("Chatbot view page is called");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return "chatbot-user-1";
     }
 }

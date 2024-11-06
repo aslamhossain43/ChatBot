@@ -1,10 +1,11 @@
 package com.practice.chatbot.config;
 
+import com.practice.chatbot.enums.TopicName;
+import com.practice.chatbot.service.PublishConsumerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,11 +16,15 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor(onConstructor_ = {@Autowired})
 public class KafkaListenerConfig {
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final PublishConsumerService publishConsumerService;
 
     @KafkaListener(topics = "topic-1", groupId = "group-1")
-    void listener(String message) {
-        log.info("Received message [{}] in group1", message);
-        simpMessagingTemplate.convertAndSend("/topic-1/public", message); // Send message by this path
+    void listener(String userString) {
+        try {
+            log.info("Received userString [{}] in group1", userString);
+            publishConsumerService.consume(TopicName.TOPIC_1, userString);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
     }
 }
