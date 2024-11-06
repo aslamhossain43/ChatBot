@@ -13,13 +13,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/chatbot")
 public class ChatBotController {
 
-    @RequestMapping("")
-    private String showChatbot() {
+    @RequestMapping("/user/1")
+    private String showChatbotForUser1() {
         try {
-            log.info("Chatbot view page is called");
+            log.info("ChatBot view page is called for user 1");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
         return "chatbot-user-1";
+    }
+
+    @RequestMapping("/user/2")
+    private String showChatbotForUser2() {
+        try {
+            log.info("ChatBot view page is called for user 2");
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        return "chatbot-user-2";
     }
 }
