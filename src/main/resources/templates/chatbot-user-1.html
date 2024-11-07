@@ -120,6 +120,11 @@
 <script>
     let stompClient;
     let chatBody = ``;
+    const messageType = {
+        CONNECT: 'CONNECT',
+        CHAT: 'CHAT',
+        DISCONNECT: 'DISCONNECT'
+    }
 
     function connect() {
         const socket = new SockJS('/ws');
@@ -128,14 +133,34 @@
             console.log('Connected: ' + frame);
             stompClient.subscribe('/topic-1/public', (message) => {
                 const messageBody = JSON.parse(message.body);
-                if (messageBody.id === '1') {
-                    chatBody += `<div class="message user">${messageBody.message}</div>`;
+                if (messageBody.username === 'Atif') {
+                    switch (messageBody.messageType) {
+                        case messageType.CONNECT:
+                            chatBody += `<p class="text-success text-center">${messageBody.message}</p>`;
+                            break;
+                        case messageType.CHAT:
+                            chatBody += `<div class="message user">${messageBody.message}</div>`;
+                            break;
+                        case messageType.DISCONNECT:
+                            chatBody += `<p class="text-danger text-center">${messageBody.message}</p>`;
+                            break;
+                    }
                 } else {
-                    chatBody += `<div class="message bot">${messageBody.message}</div>`;
+                    switch (messageBody.messageType) {
+                        case messageType.CONNECT:
+                            chatBody += `<p class="text-success text-center">${messageBody.message}</p>`;
+                            break;
+                        case messageType.CHAT:
+                            chatBody += `<div class="message bot">${messageBody.message}</div>`;
+                            break;
+                        case messageType.DISCONNECT:
+                            chatBody += `<p class="text-danger text-center">${messageBody.message}</p>`;
+                            break;
+                    }
                 }
                 document.getElementsByClassName('chat-body')[0].innerHTML = chatBody;
             });
-            const userToConnect = {id: "1", message: "Connection", messageType: "CONNECT"};
+            const userToConnect = {username: "Atif", message: "Atif is connected", messageType: "CONNECT"};
             stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToConnect));
         }, (error) => {
             console.log('Error connecting: ', error);
@@ -145,7 +170,7 @@
     function sendMessage() {
         const messageElement = document.getElementById('message');
         let message = messageElement.value;
-        const userToMessage = {id: "1", message: "" + message + "", messageType: "CHAT"};
+        const userToMessage = {username: "Atif", message: "" + message + "", messageType: "CHAT"};
         if (stompClient) {
             stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToMessage));
             messageElement.value = '';
