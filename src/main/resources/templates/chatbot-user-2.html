@@ -178,7 +178,13 @@
     }
 
     connect();
-
+    // Before tab closing
+    window.addEventListener("beforeunload", () => {
+        const userToConnect = {username: "Aslam", message: "Aslam is disconnected", messageType: "DISCONNECT"};
+        if (stompClient) {
+            stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToConnect));
+        }
+    });
 </script>
 </body>
 </html>
