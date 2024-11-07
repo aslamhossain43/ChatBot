@@ -8,19 +8,118 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            background-color: #f2f5f7;
+            font-family: Arial, sans-serif;
+        }
+
+        .chat-container {
+            max-width: 600px;
+            height: 90vh;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            margin: 20px auto;
+        }
+
+        /* Chat header */
+        .chat-header {
+            background-color: #0078d4;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        /* Chat body */
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Message styles */
+        .message {
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+            margin-bottom: 10px;
+            position: relative;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .message.user {
+            background-color: #e1f5fe;
+            color: #0078d4;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+            text-align: right;
+        }
+
+        .message.bot {
+            background-color: #f1f0f0;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+            text-align: left;
+        }
+
+        /* Chat footer */
+        .chat-footer {
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .chat-footer button {
+            border-radius: 50%;
+            height: 40px;
+            background-color: #0078d4;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            margin-left: 10px;
+        }
+    </style>
 </head>
-<body class="container bg-dark" style="border-radius: .5rem;">
-<h1 style="text-align: center">Chatbot</h1>
-<div id="messageDiv"></div>
-<div class="input-group">
-    <input type="text" class="form-control rounded-pill bg-dark text-secondary" id="message" name="message"
-           placeholder="Type a message..."
-           required>
-    <button class="btn btn-primary rounded-pill ml-1" type="button" onclick="sendMessage()">Send</button>
+<body>
+<div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">Chatbot</div>
+
+    <!-- Chat body -->
+    <div class="chat-body"></div>
+
+    <!-- Footer -->
+    <div class="chat-footer">
+        <input id="message" type="text" placeholder="Type a message...">
+        <button class="btn btn-primary rounded-pill ml-1" type="button" onclick="sendMessage()">Send</button>
+    </div>
 </div>
 <script>
     let stompClient;
-    let paragraph = ``;
+    let chatBody = ``;
 
     function connect() {
         const socket = new SockJS('/ws');
@@ -30,11 +129,11 @@
             stompClient.subscribe('/topic-1/public', (message) => {
                 const messageBody = JSON.parse(message.body);
                 if (messageBody.id === '2') {
-                    paragraph += `<p class="bg-primary rounded-pill text-light float-right" style="width: fit-content;padding: 5px">${messageBody.message}</p><br>`;
+                    chatBody += `<div class="message user">${messageBody.message}</div>`;
                 } else {
-                    paragraph += `<p class="bg-primary rounded-pill text-light" style="width: fit-content;padding: 5px">${messageBody.message}</p>`;
+                    chatBody += `<div class="message bot">${messageBody.message}</div>`;
                 }
-                document.getElementById('messageDiv').innerHTML = paragraph;
+                document.getElementsByClassName('chat-body')[0].innerHTML = chatBody;
             });
             const userToConnect = {id: "2", message: "Connection", messageType: "CONNECT"};
             stompClient.send("/api/chatbot/send", {}, JSON.stringify(userToConnect));
@@ -42,7 +141,6 @@
             console.log('Error connecting: ', error);
         });
     }
-
 
     function sendMessage() {
         const messageElement = document.getElementById('message');
