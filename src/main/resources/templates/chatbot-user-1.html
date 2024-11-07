@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <style>
-        /* General Styles */
         body {
             background-color: #f2f5f7;
             font-family: Arial, sans-serif;
@@ -47,8 +46,30 @@
             flex-direction: column;
         }
 
-        /* Message styles */
         .message {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .message.left {
+            justify-content: flex-start;
+            align-self: flex-start;
+        }
+
+        .message.right {
+            justify-content: flex-end;
+            align-self: flex-end;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin: 0 10px;
+            background: aquamarine;
+        }
+
+        .text {
             padding: 10px 15px;
             border-radius: 20px;
             max-width: 70%;
@@ -58,20 +79,16 @@
             display: inline-block;
         }
 
-        .message.user {
-            background-color: #e1f5fe;
-            color: #0078d4;
-            align-self: flex-end;
-            border-bottom-right-radius: 0;
-            text-align: right;
-        }
-
-        .message.bot {
+        .message.left .text {
             background-color: #f1f0f0;
             color: #333;
-            align-self: flex-start;
-            border-bottom-left-radius: 0;
-            text-align: left;
+            border-top-left-radius: 0;
+        }
+
+        .message.right .text {
+            background-color: #e1f5fe;
+            color: #0078d4;
+            border-top-right-radius: 0;
         }
 
         /* Chat footer */
@@ -110,7 +127,6 @@
 
     <!-- Chat body -->
     <div class="chat-body"></div>
-
     <!-- Footer -->
     <div class="chat-footer">
         <input id="message" type="text" placeholder="Type a message...">
@@ -139,7 +155,10 @@
                             chatBody += `<p class="text-success text-center">${messageBody.message}</p>`;
                             break;
                         case messageType.CHAT:
-                            chatBody += `<div class="message user">${messageBody.message}</div>`;
+                            chatBody += `<div class="message right">
+                                            <div class="text">${messageBody.message}</div>
+                                            <img src="/atif.jpeg" alt="" class="profile-pic">
+                                        </div>`;
                             break;
                         case messageType.DISCONNECT:
                             chatBody += `<p class="text-danger text-center">${messageBody.message}</p>`;
@@ -151,7 +170,10 @@
                             chatBody += `<p class="text-success text-center">${messageBody.message}</p>`;
                             break;
                         case messageType.CHAT:
-                            chatBody += `<div class="message bot">${messageBody.message}</div>`;
+                            chatBody += `<div class="message left">
+                                            <img src="/aslam.jpeg" alt="" class="profile-pic">
+                                            <div class="text">${messageBody.message}</div>
+                                        </div>`;
                             break;
                         case messageType.DISCONNECT:
                             chatBody += `<p class="text-danger text-center">${messageBody.message}</p>`;
